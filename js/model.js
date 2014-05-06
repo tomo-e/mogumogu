@@ -10,5 +10,6 @@ App.Shop = Backbone.Model.extend({
 });
 
 App.Shops = Backbone.Collection.extend({
-  model: App.Shop
+  model: App.Shop,
+  localStorage: new Backbone.LocalStorage('.shopList')
 });

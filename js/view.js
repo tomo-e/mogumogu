@@ -6,8 +6,6 @@ App.ListFormView = Backbone.View.extend({
   onSubmit: function(e) {
     e.preventDefault();
 
-　   console.log('onSubmit動いてるか')
-
     var url = this.$('input[name="url"]').val();
     this.load(url);
   },
@@ -15,7 +13,6 @@ App.ListFormView = Backbone.View.extend({
   load: function(url) {
     var self = this;
 
-    console.log('loadがきてるか');
     $.ajax({
       type: 'GET',
       url: url,
@@ -24,15 +21,37 @@ App.ListFormView = Backbone.View.extend({
         var html = $(data.responseText);
         var title = html.filter('title').text();
       
-        self.collection.add({
+        var params = {
           title: title,
           url: url
-        }, { validate: true });
+        };
+
+        if(this.model) {
+          self.model.save(params, { validate: true });
+        } else {
+          self.collection.create(params, { validate: true });
+        }
       },
       error: function(err) {
         console.log(err);
       }
     });
   }
+});
 
+App.ShopListView = Backbone.View.extend({
+  initialize: function() {
+    this.render();
+    this.listenTo(this.collection, 'add', this.render);
+  },
+  render: function() {
+    var $ul = this.$('ul');
+    $ul.empty();
+
+    this.collection.each(function(model) {
+      var shopTitle = model.get('title');
+      var shopURL = model.get('url');
+      $ul.append('<li>' + shopTitle + '<br>' + '<a href="' + shopURL + '" target="_blank">' + shopURL + '</a>' + '</li>');
+    });
+  }
 });
